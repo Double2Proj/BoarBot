@@ -262,7 +262,7 @@
       "Maybe this time you'll get a divine!",
       "Did you know that boars are nocturnal?",
       "Did you know that you can transmute a Divine boar? Use /boar help for more info!",
-      "Found a bug? Report it using /boar report!",
+      "Found a bug or need assistance? Report it using /boar report!",
       "There are %@ unique boars to collect!",
       "Boar Gifts have a chance of giving a super rare item...",
       "Over %@ users play boar game!",
@@ -2305,6 +2305,16 @@
           "name": "12:30",
           "rightClock": "\uD83D\uDD67"
         }
+      },
+      "anniversary": {
+        "name": "Anniversary",
+        "description": "It's BoarBot's first anniversary today! To celebrate, claim your free Birthday Boar!",
+        "rightStyle": 1,
+        "wrongStyle": 1,
+        "first": {
+          "name": "First",
+          "numButtons": 1
+        }
       }
     },
     "rows": [
@@ -2646,6 +2656,13 @@
         "description": "On the surface, it's indistinguishable from the grass around it. The only being capable of spotting them is Farmer Boar.",
         "isSB": false
       },
+      "birthday": {
+        "name": "Birthday Boar",
+        "pluralName": "Birthday Boars",
+        "file": "BirthdayBoar.png",
+        "description": "It is believed that this boar has been partying for eternity. Disturbingly, it has only ever done so by itself as its location is unknown.",
+        "isSB": false
+      },
       "sphere": {
         "name": "Crystal Boarb",
         "pluralName": "Crystal Boarbs",
@@ -2874,7 +2891,8 @@
       "enhancersNeeded": 2,
       "avgClones": 2,
       "boars": [
-        "carrot"
+        "carrot",
+        "birthday"
       ]
     },
     {

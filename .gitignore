@@ -4,6 +4,7 @@
 src/main/resources/items/boars/*
 !src/main/resources/items/boars/NormalBoar.png
 !src/main/resources/items/boars/CarrotBoar.png
+!src/main/resources/items/boars/BirthdayBoar.png
 !src/main/resources/items/boars/Boarb.gif
 !src/main/resources/items/boars/BoarbSTATIC.png
 !src/main/resources/items/boars/CreepyBoar.png

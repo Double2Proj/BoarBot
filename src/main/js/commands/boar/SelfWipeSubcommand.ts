@@ -137,7 +137,7 @@ export default class SelfWipeSubcommand implements Subcommand {
                         DataHandlers.GlobalFile.WipeUsers
                     ) as Record<string, number>;
 
-                    wipeUsers[this.firstInter.user.id] = Date.now() + 60000;
+                    wipeUsers[this.firstInter.user.id] = Date.now() + this.config.numberConfig.oneDay;
 
                     DataHandlers.saveGlobalData(wipeUsers, DataHandlers.GlobalFile.WipeUsers);
                 }, 'self_wipe' + this.firstInter.id + 'global').catch((err: unknown) => {

@@ -5,6 +5,7 @@ import Canvas from 'canvas';
 import {CanvasUtils} from './CanvasUtils';
 import {AttachmentBuilder} from 'discord.js';
 import {BoarBotApp} from '../../BoarBotApp';
+import {ItemConfig} from "../../bot/config/items/ItemConfig";
 
 /**
  * {@link PowerupImageGenerator PowerupImageGenerator.ts}
@@ -45,7 +46,11 @@ export class PowerupImageGenerator {
         const canvas = Canvas.createCanvas(...nums.eventSpawnSize);
         const ctx = canvas.getContext('2d');
 
-        await this.makeBaseHeaderFooter(ctx, powerupTypeID, strConfig.eventTitle.replace('%@', 'POWERUP'), config);
+        const title = powerupTypeID === "anniversary"
+            ? "ANNIVERSARY"
+            : "POWERUP";
+
+        await this.makeBaseHeaderFooter(ctx, powerupTypeID, strConfig.eventTitle.replace('%@', title), config);
 
         await CanvasUtils.drawText(
             ctx,
@@ -94,8 +99,12 @@ export class PowerupImageGenerator {
         const canvas = Canvas.createCanvas(...nums.eventSpawnSize);
         const ctx = canvas.getContext('2d');
 
+        const title = powerupTypeID === "anniversary"
+            ? "ANNIVERSARY"
+            : "POWERUP";
+
         await this.makeBaseHeaderFooter(
-            ctx, powerupTypeID, strConfig.eventEndedTitle.replace('%@', 'POWERUP'), config
+            ctx, powerupTypeID, strConfig.eventEndedTitle.replace('%@', title), config
         );
 
         if (numUsers > 0 && topClaimer && avgTime) {
@@ -176,10 +185,24 @@ export class PowerupImageGenerator {
         const fontTitle = `${nums.fontHuge}px ${strConfig.fontName}`;
         const font = `${nums.fontBig}px ${strConfig.fontName}`;
 
-        const powerupType = config.itemConfigs.powerups[powerupTypeID];
-        const powRewardStr = powerupType.rewardAmt + ' ' + (powerupType.rewardAmt as number > 1
-            ? powerupType.pluralName
-            : powerupType.name);
+        let powerupType: ItemConfig | undefined;
+
+        if (powerupTypeID != "anniversary") {
+            powerupType = config.itemConfigs.powerups[powerupTypeID];
+        }
+
+        let rewardColor;
+        let powRewardStr;
+
+        if (powerupType) {
+            powRewardStr = powerupType.rewardAmt + ' ' + (powerupType.rewardAmt as number > 1
+                ? powerupType.pluralName
+                : powerupType.name);
+            rewardColor = colorConfig.powerup;
+        } else {
+            powRewardStr = "Birthday Boar";
+            rewardColor = colorConfig.rarity4;
+        }
 
         ctx.drawImage(await Canvas.loadImage(pathConfig.otherAssets + pathConfig.eventUnderlay), ...nums.originPos);
 
@@ -213,7 +236,7 @@ export class PowerupImageGenerator {
             nums.powSpawnDescriptionWidth,
             false,
             [powRewardStr],
-            [colorConfig.powerup]
+            [rewardColor]
         );
     }
 }

@@ -22,6 +22,7 @@ import {ItemConfig} from '../bot/config/items/ItemConfig';
 import {InteractionUtils} from '../util/interactions/InteractionUtils';
 import {PowerupData} from '../bot/data/global/PowerupData';
 import {QuestData} from '../bot/data/global/QuestData';
+import {ItemImageGenerator} from "../util/generators/ItemImageGenerator";
 
 /**
  * {@link PowerupSpawner PowerupEvent.ts}
@@ -45,6 +46,7 @@ export class PowerupEvent {
     private failedServers = {} as Record<string, number>;
     private msgsToStore = {} as Record<string, string[]>;
     private readyToEnd = false;
+    private isAnniversary = (new Date().getMonth() === 6) && (new Date().getDate() == 1);
 
     constructor() {
         this.startSpawning();
@@ -182,15 +184,33 @@ export class PowerupEvent {
             this.promptTypeID = Object.keys(promptTypes)[Math.floor(
                 Math.random() * Object.keys(promptTypes).length
             )];
+
+            if (this.isAnniversary) {
+                this.promptTypeID = Object.keys(promptTypes)[4];
+            }
+
             this.promptID = this.getRandPromptID(this.promptTypeID, this.config);
             const chosenPrompt = promptTypes[this.promptTypeID][this.promptID] as PromptConfig;
 
-            this.powerupTypeID = this.getRandPowerup(this.config);
-            this.powerupType = this.config.itemConfigs.powerups[this.powerupTypeID];
+            if (!this.isAnniversary) {
+                this.powerupTypeID = this.getRandPowerup(this.config);
+            } else {
+                this.powerupTypeID = "anniversary";
+            }
 
-            LogDebug.log(
-                `Powerup Event spawning for ${this.powerupType.pluralName}, Prompt: ${chosenPrompt.name}`, this.config
-            );
+            if (!this.isAnniversary) {
+                this.powerupType = this.config.itemConfigs.powerups[this.powerupTypeID];
+            }
+
+            if (!this.isAnniversary) {
+                LogDebug.log(
+                    `Powerup Event spawning for ${this.powerupType.pluralName}, Prompt: ${chosenPrompt.name}`, this.config
+                );
+            } else {
+                LogDebug.log(
+                    `Anniversary event spawning`, this.config
+                );
+            }
 
             const rightStyle = promptTypes[this.promptTypeID].rightStyle;
             const wrongStyle = promptTypes[this.promptTypeID].wrongStyle;
@@ -232,6 +252,10 @@ export class PowerupEvent {
                             break;
                         }
 
+                        case 'anniversary': {
+                            rows = this.makeAnniversaryRows(rightStyle, rowsConfig, curTime);
+                            break;
+                        }
                     }
 
                     const powMsg = {
@@ -305,10 +329,21 @@ export class PowerupEvent {
                 );
 
                 const correctString = config.stringConfig.powRightFull;
-                const rewardString = this.powerupType.rewardAmt + ' ' +
-                    (this.powerupType.rewardAmt as number > 1
-                        ? this.powerupType.pluralName
-                        : this.powerupType.name);
+                let rewardString;
+                let rewardColor;
+
+                if (!this.isAnniversary) {
+                    rewardString = this.powerupType.rewardAmt + ' ' +
+                        (this.powerupType.rewardAmt as number > 1
+                            ? this.powerupType.pluralName
+                            : this.powerupType.name);
+                    rewardColor = config.colorConfig.powerup;
+                } else {
+                    rewardString = "Birthday Boar";
+                    rewardColor = config.colorConfig.rarity4;
+                }
+
+
                 const timeToClaim = interTime - powMsgTime;
 
                 this.claimers.set(inter.user.id, timeToClaim);
@@ -318,7 +353,7 @@ export class PowerupEvent {
                     inter, correctString,
                     config.colorConfig.font,
                     [config.stringConfig.powRight, timeToClaim.toLocaleString() + 'ms', rewardString],
-                    [config.colorConfig.green, config.colorConfig.silver, config.colorConfig.powerup],
+                    [config.colorConfig.green, config.colorConfig.silver, rewardColor],
                     true
                 );
             } else if (!hasClaimed && !fullyFailed) {
@@ -701,6 +736,25 @@ export class PowerupEvent {
         return rows;
     }
 
+    private makeAnniversaryRows(
+        rightStyle: number,
+        rowsConfig: RowConfig[],
+        id: number
+    ) {
+        const rows = [] as ActionRowBuilder<ButtonBuilder>[];
+
+        const row = new ActionRowBuilder<ButtonBuilder>();
+        const button: ButtonBuilder = new ButtonBuilder(rowsConfig[0].components[0])
+            .setLabel('Happy Anniversary!').setStyle(rightStyle).setCustomId(
+                rowsConfig[0].components[0].customId + '|' + id
+            );
+
+        row.addComponents(button);
+        rows.push(row);
+
+        return rows;
+    }
+
     /**
      * Handles when the powerup ends. Edits the spawn message and updates all user info
      *
@@ -739,13 +793,15 @@ export class PowerupEvent {
                         continue;
                     }
 
+                    const boarUser = new BoarUser(interaction.user, true);
+
                     await Queue.addQueue(async () => {
                         try {
+                            boarUser.refreshUserData();
+
                             const questConfig = config.questConfigs;
                             const questData = DataHandlers.getGlobalData(DataHandlers.GlobalFile.Quest) as QuestData;
                             const powFirstIndex = questData.curQuestIDs.indexOf('powFirst');
-
-                            const boarUser = new BoarUser(interaction.user, true);
 
                             const increasePowFirst = powFirstIndex >= 0 &&
                                 userTime <= questConfig['powFirst'].questVals[Math.floor(powFirstIndex / 2)][0];
@@ -781,24 +837,38 @@ export class PowerupEvent {
 
                             boarUser.stats.powerups.attempts++;
 
-                            const powRewardAmt = this.powerupType.rewardAmt as number;
-
-                            boarUser.itemCollection.powerups[this.powerupTypeID].numTotal += powRewardAmt;
+                            if (!this.isAnniversary) {
+                                const powRewardAmt = this.powerupType.rewardAmt as number;
+                                boarUser.itemCollection.powerups[this.powerupTypeID].numTotal += powRewardAmt;
+                            }
 
                             boarUser.updateUserData();
 
-                            const rewardString = this.powerupType.rewardAmt + ' ' +
-                                (this.powerupType.rewardAmt as number > 1
-                                    ? this.powerupType.pluralName
-                                    : this.powerupType.name);
+                            let rewardString;
+                            let rewardColor;
+
+                            if (!this.isAnniversary) {
+                                rewardString = this.powerupType.rewardAmt + ' ' +
+                                    (this.powerupType.rewardAmt as number > 1
+                                        ? this.powerupType.pluralName
+                                        : this.powerupType.name);
+                                rewardColor = colorConfig.powerup;
+                            } else {
+                                rewardString = "Birthday Boar";
+                                rewardColor = colorConfig.rarity4;
+                            }
+
+                            const eventType = this.isAnniversary
+                                ? "Anniversary Event"
+                                : "Powerup Event";
 
                             if (boarUser.stats.powerups.attempts > config.numberConfig.powExperiencedNum) {
                                 await Replies.handleReply(
                                     interaction,
                                     strConfig.powResponseShort,
                                     config.colorConfig.font,
-                                    [rewardString, 'Powerup Event'],
-                                    [colorConfig.powerup, colorConfig.powerup],
+                                    [rewardString, eventType],
+                                    [rewardColor, colorConfig.powerup],
                                     true
                                 ).catch(() => {});
                             } else {
@@ -808,14 +878,14 @@ export class PowerupEvent {
                                     config.colorConfig.font,
                                     [
                                         rewardString,
-                                        'Powerup Event',
+                                        eventType,
                                         '/boar collection',
                                         'Powerups',
                                         '/boar help',
                                         'Powerups'
                                     ],
                                     [
-                                        colorConfig.powerup,
+                                        rewardColor,
                                         colorConfig.powerup,
                                         colorConfig.silver,
                                         colorConfig.powerup,
@@ -836,6 +906,17 @@ export class PowerupEvent {
                     }, 'pow_update_stats' + interaction.id + interaction.user.id).catch((err: unknown) => {
                         throw err;
                     });
+
+                    if (this.isAnniversary) {
+                        await boarUser.addBoars(["birthday"], interaction, this.config);
+                        await interaction.followUp({
+                            files: [
+                                await new ItemImageGenerator(
+                                    interaction.user, "birthday", "First Anniversary!", this.config
+                                ).handleImageCreate()
+                            ]
+                        });
+                    }
                 }
 
                 await Queue.addQueue(async () => {

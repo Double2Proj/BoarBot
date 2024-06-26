@@ -103,6 +103,7 @@ export class PathConfig {
     public readonly circleMask = '' as string;
     public readonly bucks = '' as string;
     public readonly powerup = '' as string;
+    public readonly anniversary = '' as string;
     public readonly check = '' as string;
     public readonly noAvatar = '' as string;
     public readonly guessInterpreterFile = '' as string;

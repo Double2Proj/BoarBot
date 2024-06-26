@@ -182,7 +182,7 @@ export class PowerupEvent {
             const promptConfig = this.config.promptConfigs;
             const promptTypes = promptConfig.types;
             this.promptTypeID = Object.keys(promptTypes)[Math.floor(
-                Math.random() * Object.keys(promptTypes).length
+                Math.random() * (Object.keys(promptTypes).length-1)
             )];
 
             if (this.isAnniversary) {

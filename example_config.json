@@ -279,7 +279,8 @@
       "Want to suggest a new boar or feature? Join the server in my About Me!",
       "BoarBot has a lot more to it than just running /boar daily! To see everything BoarBot has to offer, use /boar help!",
       "Boar-o-ween happens every year on Halloween and consists of a series of intricate hunts and unique rewards. Interested in playing? Join our Discord server: https://discord.gg/DXSwKHYrCa",
-      "Boarmas is now active for the Holidays! Boar Gifts are more frequent from Powerup Events, there's new boars to obtain, and Boar Gifts have improved odds for getting rarer boars!"
+      "Boarmas is now active for the Holidays! Boar Gifts are more frequent from Powerup Events, there's new boars to obtain, and Boar Gifts have improved odds for getting rarer boars!",
+      "It's BoarBot's first anniversary today! Be on the lookout for exclusive Anniversary Events spawning in your server!"
     ],
     "notificationServerPing": "<@&1001233916620972082> \n*Note: If you run /boar daily a second time, then click \"Enable Notifications\", you can receive your notifications in DMs instead. To disable this ping, un-react to the boar emoji in <#996887892737667204>*",
     "questCompletionBonus": "Full Completion Bonus:",
@@ -2661,7 +2662,8 @@
         "pluralName": "Birthday Boars",
         "file": "BirthdayBoar.png",
         "description": "It is believed that this boar has been partying for eternity. Disturbingly, it has only ever done so by itself as its location is unknown.",
-        "isSB": false
+        "isSB": false,
+        "blacklistType": "normal"
       },
       "sphere": {
         "name": "Crystal Boarb",

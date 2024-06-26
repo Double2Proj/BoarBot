@@ -191,27 +191,33 @@ export class PowerupImageGenerator {
             powerupType = config.itemConfigs.powerups[powerupTypeID];
         }
 
-        let rewardColor;
-        let powRewardStr;
+        let rewardColor: string;
+        let powRewardStr: string;
+        let eventColor: string;
+        let imagePath: string;
 
         if (powerupType) {
             powRewardStr = powerupType.rewardAmt + ' ' + (powerupType.rewardAmt as number > 1
                 ? powerupType.pluralName
                 : powerupType.name);
             rewardColor = colorConfig.powerup;
+            eventColor = colorConfig.powerup;
+            imagePath = pathConfig.otherAssets + pathConfig.powerup;
         } else {
             powRewardStr = "Birthday Boar";
             rewardColor = colorConfig.rarity4;
+            eventColor = colorConfig.gold;
+            imagePath = pathConfig.otherAssets + pathConfig.anniversary;
         }
 
         ctx.drawImage(await Canvas.loadImage(pathConfig.otherAssets + pathConfig.eventUnderlay), ...nums.originPos);
 
         await CanvasUtils.drawText(
-            ctx, title, nums.eventTitlePos, fontTitle, 'center', colorConfig.powerup, nums.eventTitleWidth, true
+            ctx, title, nums.eventTitlePos, fontTitle, 'center', eventColor, nums.eventTitleWidth, true
         );
 
         ctx.drawImage(
-            await Canvas.loadImage(pathConfig.otherAssets + pathConfig.powerup),
+            await Canvas.loadImage(imagePath),
             ...nums.eventCornerImgPos1, ...nums.eventCornerImgSize
         );
 
@@ -219,7 +225,7 @@ export class PowerupImageGenerator {
         ctx.scale(-1, 1);
 
         ctx.drawImage(
-            await Canvas.loadImage(pathConfig.otherAssets + pathConfig.powerup),
+            await Canvas.loadImage(imagePath),
             ...nums.eventCornerImgPos2, ...nums.eventCornerImgSize
         );
 

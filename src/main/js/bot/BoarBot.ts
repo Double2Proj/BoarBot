@@ -261,7 +261,8 @@ export class BoarBot implements Bot {
 						}
 
 						case 20:
-						case 21: {
+						case 21:
+						case 22: {
 							randMsgStr = msgStrs[0];
 							break;
 						}
@@ -274,6 +275,10 @@ export class BoarBot implements Bot {
 					}
 
 					if (curDate.getMonth() === 11 && curDate.getDate() >= 22) {
+						randMsgStr = '## ' + msgStrs[21] + '\n';
+					}
+
+					if (curDate.getMonth() === 6 && curDate.getDate() === 1) {
 						randMsgStr = '## ' + msgStrs[21] + '\n';
 					}
 
